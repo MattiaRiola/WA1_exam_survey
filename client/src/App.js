@@ -1,10 +1,12 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import MyNavbar from './MyNavbar.js';
+import { LoginForm, LogoutButton } from './LoginComponents';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import API from './API.js';
 import AdminMainContent from './AdminMainContent';
 import VisitorMainContent from './VisitorMainContent';
 
@@ -50,6 +52,11 @@ function App() {
       <Container fluid>
         <Row className="row-height">
           <Switch>
+          
+          <Route path="/login">
+            <>{loggedIn ? <Redirect to="/" /> : <LoginForm login={doLogIn} />}</>
+          </Route>
+
           <Route exact path="/">
           <>
             {loggedIn ? 
@@ -58,7 +65,6 @@ function App() {
           }
           </>
           </Route>
-
           </Switch>
 
         </Row>
