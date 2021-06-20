@@ -4,7 +4,7 @@ const sqlite = require('sqlite3');
 const bcrypt = require('bcrypt');
 
 // open the database
-const db = new sqlite.Database('tasks.db', (err) => {
+const db = new sqlite.Database('survey.db', (err) => {
     if (err) throw err;
 });
 
@@ -21,7 +21,7 @@ exports.getUser = (email, password) => {
             else {
                 bcrypt.compare(password, row.hash).then(result => {
                     if (result) // password matches
-                        resolve({ id: row.id, username: row.email, name: row.name });
+                        resolve({ id: row.id, username: row.email, name: row.username });
                     else
                         resolve(false); // password not matching
                 })
@@ -40,7 +40,7 @@ exports.getUserById = (id) => {
             resolve({error: 'User not found.'});
           else {
             // by default, the local strategy looks for "username": not to create confusion in server.js, we can create an object with that property
-            const user = {id: row.id, username: row.email, name: row.name}
+            const user = {id: row.id, username: row.email, name: row.username}
             resolve(user);
           }
       });
