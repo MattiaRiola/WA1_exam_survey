@@ -15,7 +15,7 @@ function LoginForm(props) {
 
     // SOME VALIDATION, ADD MORE!!!
     let valid = true;
-    if (username === '' || password === '' || password.length < 6)
+    if (username === '' || password === '' || password.length < 1)
       valid = false;
 
     if (valid) {

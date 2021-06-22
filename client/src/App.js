@@ -26,7 +26,7 @@ function App() {
   useEffect(() => {
     API.getUserInfo().then(user => {    /* Se sono nel then, l'utente è loggato (l'API ritorna un oggetto contenente user info) */
       setLoggedIn(true);
-      setMessage({ msg: `Welcome, ${user.name}!`, type: 'success' });  // we set it again here because otherwise when F5 the message created from LogIn disappears
+      setMessage({ msg: `Welcome, ${user.username}!`, type: 'success' });  // we set it again here because otherwise when F5 the message created from LogIn disappears
     }).catch(error => {
       setLoggedIn(false);              /* Se sono nella catch l'API non ha restituito un utente, dunque non è loggato */
     });
