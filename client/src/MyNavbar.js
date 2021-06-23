@@ -22,7 +22,7 @@ function MyNavbar(props) {
                 </Navbar.Text>
                 <>
                 {props.loggedIn ? 
-                    <LogoutButton></LogoutButton> 
+                    <LogoutButton logout={props.logout} ></LogoutButton> 
                 :<Link to="/login"> <LoginButton></LoginButton></Link>
                 }
                 </>
