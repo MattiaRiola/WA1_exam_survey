@@ -14,6 +14,7 @@ const passportLocal = require('passport-local');
 
 // const task_dao = require('./task-dao');
 const user_dao = require('./user-dao');
+const survey_dao = require('./survey-dao');
 
 
 // initialize and configure passport
@@ -83,8 +84,21 @@ app.get('/', (req, res) => {
     res.send('Hello World, from your server');
 });
 
+app.get('/api/allSurveys',
+    (req, res) => {
+        survey_dao.allSurveys()
+        .then((surveys) => {res.json(surveys)})
+        .catch((error) => {res.status(500).json(error)});
+    }
+)
 
-
+app.get('/api/yourSurveys',
+    (req, res) => {
+        survey_dao.surveysByAdmin(req.user.id)
+        .then((survey) => {res.json(surveys)})
+        .catch((error) => {res.status(500).json(error)});
+    }
+)
 
 
 
