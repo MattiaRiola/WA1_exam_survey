@@ -9,13 +9,20 @@ import { useEffect, useState } from 'react';
 
 //COMPONENTS
 import API from './API.js';
-import { LoginForm, LogoutButton } from './LoginComponents';
+import { LoginForm } from './LoginComponents';
 import MyNavbar from './MyNavbar.js';
 import AdminMainContent from './AdminMainContent';
 import VisitorMainContent from './VisitorMainContent';
+import AnswerSurvey from './AnswerSurvey';
 
 
 function App() {
+
+  /***  state variables for surveys */
+  const [surveys, setSurveys] = useState([]);
+  const [dirty, setDirty] = useState(false);
+  const [loading, setLoading] = useState(true);
+
 
   /*** Logged in */
   const [loggedIn, setLoggedIn] = useState(false); // at the beginning, no user is logged in
@@ -24,11 +31,11 @@ function App() {
 
   /** Ask server if user is logged in everytime the page is mounted. This information is stored in the cookie of the session */
   useEffect(() => {
-    API.getUserInfo().then(user => {    /* Se sono nel then, l'utente è loggato (l'API ritorna un oggetto contenente user info) */
+    API.getUserInfo().then(user => {    /* I'm in the "then", the user is logged in ( the API returned an user info object) */
       setLoggedIn(true);
       setMessage({ msg: `Welcome, ${user.username}!`, type: 'success' });  // we set it again here because otherwise when F5 the message created from LogIn disappears
     }).catch(error => {
-      setLoggedIn(false);              /* Se sono nella catch l'API non ha restituito un utente, dunque non è loggato */
+      setLoggedIn(false);              /* I'm on the "catch" so the API didn't give me the user */
     });
   }, []); // only at mount time
 
@@ -50,30 +57,125 @@ function App() {
   }
 
 
+  //Rehydrate tasks at mount time
+  useEffect(() => {
+    console.log("rehydrating the surveys, lenght = ", surveys.length)
+    if (!loggedIn) {
+      API.getAllSurveys().then(newS => {
+        let result = [];
+        newS.forEach(survey => {
+          result.push(survey);
+        });
+        setDirty(false);
+        setSurveys(result);
+        setLoading(false);
+      })
+        .catch(err => {
+          console.log(err);
+          //this must be the right order in this way I wont send more than 1 request to the server
+          // setting Dirty the if will be false
+          setDirty(false);
+          setSurveys([]);
+          setLoading(false);
+        });
+    }
+    else {
+      API.getSurveysByAdmin().then(newS => {
+        let result = [];
+        newS.forEach(survey => {
+          result.push(survey);
+        });
+        setDirty(false);
+        setSurveys(result);
+        setLoading(false);
+      })
+        .catch(err => {
+          console.log(err);
+          //this must be the right order in this way I wont send more than 1 request to the server
+          // setting Dirty the if will be false
+          setDirty(false);
+          setSurveys([]);
+          setLoading(false);
+        });
+    }
+
+  }, [loggedIn]);
+  // Rehydrate surveys at mount time, and when suveys are updated
+  useEffect(() => {
+    if (dirty) {
+      console.log("rehydrating the surveys, lenght = ", surveys.length)
+      if (!loggedIn) {
+        API.getAllSurveys().then(newS => {
+          let result = [];
+          newS.forEach(survey => {
+            result.push(survey);
+          });
+          setDirty(false);
+          setSurveys(result);
+          setLoading(false);
+        })
+          .catch(err => {
+            console.log(err);
+            //this must be the right order in this way I wont send more than 1 request to the server
+            // setting Dirty the if will be false
+            setDirty(false);
+            setSurveys([]);
+            setLoading(false);
+          });
+      }
+      else {
+        API.getSurveysByAdmin().then(newS => {
+          let result = [];
+          newS.forEach(survey => {
+            result.push(survey);
+          });
+          setDirty(false);
+          setSurveys(result);
+          setLoading(false);
+        })
+          .catch(err => {
+            console.log(err);
+            //this must be the right order in this way I wont send more than 1 request to the server
+            // setting Dirty the if will be false
+            setDirty(false);
+            setSurveys([]);
+            setLoading(false);
+          });
+      }
+    }
+  }, [surveys.length, dirty, loggedIn]);
+
+
   return (
     <Router>
       <MyNavbar message={message} logout={doLogOut} loggedIn={loggedIn} />
       <Container fluid>
         <Row className="row-height">
           <Switch>
-          
-          <Route path="/login">
-            <>{loggedIn ? <Redirect to="/" /> : <LoginForm login={doLogIn} />}</>
-          </Route>
 
-          <Route exact path="/">
-          <>
-            {loggedIn ? 
-            <AdminMainContent />
-            : <VisitorMainContent/> 
-          }
-          </>
-          </Route>
+            <Route path="/survey/:survey_id" render={({ match }) =>
+              <>{
+              loggedIn ? <Redirect to="/" /> 
+              : <AnswerSurvey survey={surveys.find((s) => s.survey_id == match.params.survey_id)} />
+              }</>
+            } />
+            <Route path="/login">
+              <>{loggedIn ? <Redirect to="/" /> : <LoginForm login={doLogIn} />}</>
+            </Route>
+
+            <Route exact path="/">
+              <>
+                {loggedIn ?
+                  <AdminMainContent />
+                  : <VisitorMainContent surveys={surveys} />
+                }
+              </>
+            </Route>
           </Switch>
 
         </Row>
       </Container>
-    
+
     </Router>
 
 
