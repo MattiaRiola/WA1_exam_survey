@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Form, Button, Alert, Col, Row, Container, ListGroup } from 'react-bootstrap';
+import {  Col,  ListGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 function VisitorMainContent(props) {
