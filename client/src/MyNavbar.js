@@ -1,9 +1,7 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Navbar from 'react-bootstrap/Navbar';
-import Nav from 'react-bootstrap/Nav';
 import surveylogo from './journal-text.svg';
-import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 import { LoginButton,LogoutButton } from './LoginComponents';
 
