@@ -40,14 +40,39 @@ exports.surveysByAdmin = (userId) => {
                 reject(err);
                 return;
             }
-            const surveys = rows.map((s) => ({ 
+            const survey = rows.map((s) => ({ 
                 survey_id: s.survey_id,
                 user_id: s.user_id,
                 title: s.title, 
                 questions: s.questions,
                 answers_number: s.answers_number
             }));
-            resolve(surveys);
+            resolve(survey);
+        });
+    });
+};
+
+// get all surveys
+exports.surveyById = (surveyId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM surveys WHERE survey_id = ?';
+        db.get(sql, [surveyId], (err, row) => {
+            if (err) {
+                reject(err);
+                return;
+              }
+              if (row == undefined) {
+                reject({error: 'Survey not found.'});
+              } else {
+                const survey = { 
+                    survey_id: row.survey_id,
+                    user_id: row.user_id,
+                    title: row.title, 
+                    questions: row.questions,
+                    answers_number: row.answers_number
+                };
+                resolve(survey);
+              }
         });
     });
 };

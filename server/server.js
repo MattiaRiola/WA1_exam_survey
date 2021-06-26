@@ -100,7 +100,14 @@ app.get('/api/yourSurveys',
     }
 )
 
-
+app.get('/api/survey/:id',
+    (req, res) => {
+        const id = req.params.id;
+        survey_dao.surveyById(id)
+        .then((survey) => {res.json(survey)})
+        .catch((error) => {res.status(500).json(error)});
+    }
+)
 
 /*****************************************************************************************/
 /**
