@@ -48,7 +48,7 @@ async function getSurveysByAdmin() {
         const response = await fetch('/api/yourSurveys/');
         if (response.ok) {
             const surveys = await response.json();
-            return surveys;
+            return surveys.map(s => {s.questions = JSON.parse(s.questions); return s;});
         }
         else {
             throw new Error(response.statusText);
@@ -64,7 +64,7 @@ async function getAllSurveys() {
         const response = await fetch('/api/allSurveys/');
         if (response.ok) {
             const surveys = await response.json();
-            return surveys;
+            return surveys.map(s => {s.questions = JSON.parse(s.questions); return s;});
         }
         else {
             throw new Error(response.statusText);
@@ -75,8 +75,25 @@ async function getAllSurveys() {
     }
 }
 
+async function getSurveyById(id){
+    try {
+        const response = await fetch('/api/survey/'+id);
+        if (response.ok) {
+            const survey = await response.json();
+            
+            survey.questions = JSON.parse(survey.questions);
+            return survey;
+        }
+        else {
+            throw new Error(response.statusText);
+        }
+    } catch (err) {
+        console.log(err);
+        throw new Error(err);
+    }
+}
 
-const API = { logIn, logOut, getUserInfo , getSurveysByAdmin, getAllSurveys};
+const API = { logIn, logOut, getUserInfo , getSurveysByAdmin, getAllSurveys, getSurveyById};
 
 
 export default API;
