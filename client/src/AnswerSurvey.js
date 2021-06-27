@@ -32,19 +32,31 @@ import API from './API.js';
  */
 function AnswerSurvey(props) {
     let voidAnswers = [];
-    // for (let q of JSON.parse(props.survey.questions)) {
-    //     if (q.options === undefined)
-    //         voidAnswers[q.questionId] = {
-    //             questionId: q.questionId,
-    //             text: ""
-    //         };
-    //     else
-    //         voidAnswers[q.questionId] = {
-    //             questionId: q.questionId,
-    //             selectedOptions: []
-    //         };
-    // }
     const [answers, setAnswers] = useState(voidAnswers);
+    /**
+     * 
+     * @param {*} optionId  optionId selected
+     * @param {*} questionId question related to that option
+     * @param {*} toCheck if true -> add the option to the selectedOption vector
+     *                    if fals -> delete the option to the selectedOption vector
+     */
+    const selectOption = (optionId, questionId, toCheck, max) => {
+        setAnswers((oldAnswers) => {
+            let newAnswers = oldAnswers.slice();
+            if (toCheck) {
+                if (newAnswers[questionId].selectedOptions.length < max)
+                    if (!newAnswers[questionId].selectedOptions.includes(optionId))
+                        newAnswers[questionId].selectedOptions = [...oldAnswers[questionId].selectedOptions, optionId];
+
+            }
+            else
+                newAnswers[questionId].selectedOptions = oldAnswers[questionId].selectedOptions.filter(o => o != optionId);
+            return newAnswers;
+        }
+
+        )
+    }
+
     const [questions, setQuestions] = useState([]);
     const [selectedSurvey, setSelectedSurvey] = useState();
     /**
@@ -91,75 +103,115 @@ function AnswerSurvey(props) {
                     selectedOptions: []
                 };
         }
+        voidAnswers = voidAnswers.slice(1, voidAnswers.length);
         setQuestions(tmpQuestions);
         setAnswers(voidAnswers);
     }, [props.surveys.length, props.surveyId, questions.length, answers.length, selectedSurvey]);
 
 
+    if (props.surveys === undefined || props.surveyId === undefined)
+        return (<> <h1>Loading... surveys undefined</h1></>);
+    else
+        if (props.survey === undefined)
+            return (<> <h1>Loading... selected survey undefined</h1> </>);
+        else {
+            return (
 
-    return (
+                <>
+                    (<Col className="bg-light" >
+                        <h5>TODO: Insert the mandatory name and use it as use state to force it to be not empty before showing the questions</h5>
+                        <QuestionTable surveys={props.surveys} questions={questions} survey={props.survey} selectOption={selectOption}
+                            answers={answers} setAnswers={setAnswers} />
+                        <AnswersTable answers={answers} />
+                    </Col>)
 
-        <>
-            (<Col className="bg-light" >
-                <h5>TODO: Insert the mandatory name and use it as use state to force it to be not empty before showing the questions</h5>
-                <QuestionTable surveys={props.surveys} questions={questions}
-                    answers={answers} setAnswers={setAnswers} />
-                <AnswersTable answers={answers} />
-            </Col>)
+                </>
 
-        </>
-
-    );
+            );
+        }
 }
 
 function QuestionTable(props) {
-    const handleSubmit = () => {
-        console.log("TODO: implement Handle submit and validators during the submit ")
+    const handleSubmit = (event) => {
+        //validation for the max 200 chars or max number of option selected of each answer can be done here
+        // but the validation in this case is implicit in the construction of the answers vector
+        event.preventDefault();
+        const form = event.currentTarget;
+        let validationError = "";
+        for (let q of props.questions) {
+            if (q.options !== undefined) {
+                if (q.min > 0 && props.answers[q.questionId - 1].selectedOptions.length < 1)
+                    validationError+=("question number " + q.questionId + " is required, please give an answer\n");
+            } else {
+                if (q.mandatory == 1 && props.answers[q.questionId - 1].text.length < 1)
+                    validationError+=("question number " + q.questionId + " is required, the text must not be empty\n");
+            }
+        }
+        if(validationError == ""){
+            API.sendAnswers(
+                props.answers,
+                 props.survey.survey_id,
+                //TODO: VisitorName
+                // props.visitorName
+                "Bugo" 
+                )
+        }
+        console.log(validationError);
     }
 
 
+    if (props.questions === undefined)
+        return (<><h1>Loading questions...</h1></>);
+    else
+        return (
+            <>
 
-    return (
-        <>
+                <h1>Questions:</h1>
 
-            <h1>Questions:</h1>
+                <Form noValidate onSubmit={handleSubmit}>
 
-            <Form noValidate onSubmit={handleSubmit}>
+                    {props.questions.map(question =>
+                        <Form.Group controlId="exampleForm.ControlTextarea1" key={question.questionId}>
 
-                {props.questions.map(question =>
-                    <Form.Group controlId="exampleForm.ControlTextarea1" key={question.questionId}>
-
-                        {
-                            (question.options === undefined) ?
-                                <OpenQuestionRow key={question.questionId} question={question} answers={props.answers} setAnswers={props.setAnswers} />
-                                : <ClosedQuestionRow key={question.questionId} question={question} answers={props.answers} setAnswers={props.setAnswers} />
-                        }
-                    </Form.Group>
-
+                            {
+                                (question.options === undefined) ?
+                                    <OpenQuestionRow key={question.questionId} question={question} questionId={question.questionId - 1} answers={props.answers} setAnswers={props.setAnswers} />
+                                    : <ClosedQuestionRow key={question.questionId} questionId={question.questionId}
+                                        question={question} answers={props.answers}
+                                        setAnswers={props.setAnswers} selectOption={props.selectOption} />
+                            }
+                        </Form.Group>
 
 
-                )
 
-                }
-                <Button type="submit">Send answers</Button>
-            </Form>
+                    )
 
-        </>
-    );
+                    }
+                    <Button type="submit">Send answers</Button>
+                </Form>
+
+            </>
+        );
 }
 
 function OpenQuestionRow(props) {
     return (
         <>
 
-            <Form.Label>{props.question.title}</Form.Label>
+            <Form.Label>{props.question.title} {props.question.max} {props.question.options === undefined ? 
+                        props.question.mandatory ? "mandatory" : ""                            
+                         : props.question.min > 0 ? "mandatory" : "" }
+            </Form.Label>
             <Form.Control as="textarea"
                 rows={3}
                 type="description"
                 placeholder="Enter your answer here"
-                value={props.answers[props.question.questionId] === undefined ? "" : props.answers[props.question.questionId].text}
+                value={props.answers[props.question.questionId] === undefined ? "" : props.answers[props.questionId].text}
                 onChange={
                     answerText => {
+                        if (answerText.target.value.length > 200) {
+                            return;
+                        }
                         props.setAnswers(oldAnswers => {
                             return oldAnswers.map(a => {
                                 if (a.questionId == props.question.questionId)
@@ -188,16 +240,16 @@ function ClosedQuestionRow(props) {
             </h5>
             {props.question.options.map(option =>
                 <Form.Row key={option.optionId}>
-                    {
+                    <QuestionOption
+                        question={props.question}
+                        questionId={props.questionId - 1}
+                        option={option}
+                        answers={props.answers}
+                        setAnswers={props.setAnswers}
+                        optionId={option.optionId}
 
-                        (props.question.title !== undefined
-                    /**TODO: sostituire questa condizione con:
-                     * props.answers.find(props.question.questionId).length < props.question.max  && props.answers[props.question.questionId].selectedOptions.find(option.optionId)*/) ?
-                            <QuestionOption question={props.question} option={option} answers={props.answers} />
-                            :
-                            //TODO: caso in cui il ho già dato il num max di risposte
-                            (<Form.Check inline type="checkbox" id="gridCheck3" disabled />)
-                    }
+                        selectOption={props.selectOption}
+                    />
                     <p>{option.text}</p>
                 </Form.Row>
 
@@ -208,15 +260,26 @@ function ClosedQuestionRow(props) {
 }
 
 function QuestionOption(props) {
+    if (props.questionId === undefined)
+        return (<> <h1>Loading questionId</h1></>);
+    else
+        if (props.answers[props.questionId] === undefined)
+            return (<> <h1>Loading answers[props.questionId]</h1></>);
+    if (props.answers[props.questionId].selectedOptions === undefined)
+        return (<><h1> Loading selected options length</h1></>);
+    else
+        return (
+            <>
+                <Form.Check inline type="checkbox" id="gridCheck3"
+                    checked={props.answers[props.questionId].selectedOptions.includes(props.optionId) ? true : false
 
-    return (
-        <>
-            <Form.Check inline type="checkbox" id="gridCheck3"
-                onChange={() => {
-                    //TODO: Add the selected option
-                }}
-            />
-        </>);
+                    }
+                    onChange={(td) => {
+                        props.selectOption(props.optionId, props.questionId, td.target.checked, props.question.max);
+
+                    }}
+                />
+            </>);
 }
 
 function AnswersTable(props) {
@@ -224,9 +287,9 @@ function AnswersTable(props) {
         <>
             <h1>Answers: </h1>
             {props.answers.map(a =>
-                <p >
+                <p key={a.questionId} >
                     question n. {a.questionId}:
-                    {a.text === undefined ? a.selectedOptions : a.text}
+                    {a.text === undefined ? ("selected options: [" + a.selectedOptions + "]") : a.text}
                 </p>
             )}
         </>

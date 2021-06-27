@@ -1,16 +1,19 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import {  Col,  ListGroup } from 'react-bootstrap';
+import { Col, ListGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 function VisitorMainContent(props) {
-  return (
-    <>
-      <Col className="bg-light" >
+  if (props.surveys === undefined)
+    return (<></>);
+  else
+    return (
+      <>
+        <Col className="bg-light" >
 
-        <ActiveSurveyTable surveys={props.surveys} />
-      </Col>
-    </>
-  );
+          <ActiveSurveyTable surveys={props.surveys} />
+        </Col>
+      </>
+    );
 }
 
 function ActiveSurveyTable(props) {
@@ -36,7 +39,7 @@ function ActiveSurveyRow(props) {
   return (
     <>
       <ListGroup.Item as="li" action variant="secondary">
-        <Link to={"/survey/"+props.survey.survey_id}>
+        <Link to={"/survey/" + props.survey.survey_id}>
           {props.survey.title}
         </Link>
       </ListGroup.Item>

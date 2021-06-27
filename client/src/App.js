@@ -69,6 +69,7 @@ function App() {
         newS.forEach(survey => {
           result.push(survey);
         });
+        console.log(result);
         setDirty(false);
         setSurveys(result);
         setLoading(false);

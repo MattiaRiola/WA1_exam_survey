@@ -77,7 +77,7 @@ app.use(passport.session());
 
 
 //to install for validating (npm install --save express-validator)
-// const { body, validationResult, query } = require('express-validator');
+const { body, validationResult, query } = require('express-validator');
 
 
 app.get('/', (req, res) => {
@@ -87,16 +87,16 @@ app.get('/', (req, res) => {
 app.get('/api/allSurveys',
     (req, res) => {
         survey_dao.allSurveys()
-        .then((surveys) => {res.json(surveys)})
-        .catch((error) => {res.status(500).json(error)});
+            .then((surveys) => { res.json(surveys) })
+            .catch((error) => { res.status(500).json(error) });
     }
 )
 
 app.get('/api/yourSurveys',
     (req, res) => {
         survey_dao.surveysByAdmin(req.user.id)
-        .then((survey) => {res.json(surveys)})
-        .catch((error) => {res.status(500).json(error)});
+            .then((surveys) => { res.json(surveys) })
+            .catch((error) => { res.status(500).json(error) });
     }
 )
 
@@ -104,10 +104,91 @@ app.get('/api/survey/:id',
     (req, res) => {
         const id = req.params.id;
         survey_dao.surveyById(id)
-        .then((survey) => {res.json(survey)})
-        .catch((error) => {res.status(500).json(error)});
+            .then((survey) => { res.json(survey) })
+            .catch((error) => { res.status(500).json(error) });
     }
 )
+
+app.post('/survey/api/sendAnswers',
+    //TODO: Other validations on the other parts of the body
+    (req, res) => {
+
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        console.log("starting to insert answers");
+        const id = req.body.surveyId;
+        const name = req.body.visitorName;
+        const answers = req.body.answers;
+
+        const checkAnswers = (survey) => {
+            let questions = survey["questions"];
+            let verified = true;
+            questions.forEach(q => {
+                let answer = answers.filter(a => (a.questionId === q.questionId));
+                //open question
+                console.log("checking question number " + q.questionId);
+                if (q.options === undefined) {
+                    /** Check if answers to open question is mandatory and user answered it */
+                    if ((answer[0] === undefined || answer[0].text === undefined || answer[0].text.length === 0) && q.mandatory === 1) {
+                        console.log("text not found");
+                        verified = false;
+                    }
+                } else {
+                    //multiple choice question
+                    /** Check if answers to multiple question is mandatory and user answered it */
+                    if ((answer[0] === undefined || answer[0].selectedOptions.length == 0) && q.min > 0) {
+                        console.log("")
+                        verified = false;
+                    }
+
+                    let ansNum;
+                    //closed answer not given
+                    if (answer[0] === undefined) {
+                        ansNum = 0;
+                    } else {
+                        console.log("closed answer num options:  " +answer[0].selectedOptions.length);
+                        ansNum = answer[0].selectedOptions.length;
+                    }
+
+
+                    if (ansNum > q.max || ansNum < q.min) {
+                        console.log("max min of closed answer not respected")
+                        verified = false;
+                    }
+                }
+
+            });
+            return verified;
+        }
+
+        survey_dao.surveyById(id)
+            .then((survey) => {
+                if (Object.entries(survey).length === 0)
+                    res.status(404).json({ surveyId: this.id, error: "No survey with given id" });
+                else {
+                    /** Check if mandatory answers are given from user */
+                    if (checkAnswers(survey)) {
+                        /** Add answer to database */
+                        console.log("ANSWERS OK!")
+                        survey_dao.addAnswers(id, name, answers).then(() => {
+                            /** Increment number of answers to that survey */
+                            survey.answers_number++;
+                            console.log(survey.answers_number)
+                            survey_dao.incrementAnswersNum(id, survey.answers_number);
+                            res.end();
+                        })
+                            .catch((error) => { res.status(500).json(error); });
+                    } else {
+                        res.status(400).json("Invalid answers given");
+                    }
+                }
+            })
+            .catch((error) => { res.status(500).json(error); });
+    }
+);
+
 
 /*****************************************************************************************/
 /**
@@ -157,7 +238,7 @@ app.get('/api/sessions/current', (req, res) => {
 // If i get here, it is an unknown route
 // Ref: https://stackoverflow.com/questions/11500204/how-can-i-get-express-js-to-404-only-on-missing-routes
 app.use(function (req, res) {
-    res.status(404).json({error: 'Not found!'});
+    res.status(404).json({ error: 'Not found!' });
 });
 
 app.listen(port, () => console.log(`Server running on http://localhost:${port}/`));

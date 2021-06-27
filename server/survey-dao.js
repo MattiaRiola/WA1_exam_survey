@@ -22,7 +22,7 @@ exports.allSurveys = () => {
                 survey_id: s.survey_id,
                 user_id: s.user_id,
                 title: s.title, 
-                questions: s.questions,
+                questions: JSON.parse(s.questions),
                 answers_number: s.answers_number
             }));
             resolve(surveys);
@@ -44,7 +44,7 @@ exports.surveysByAdmin = (userId) => {
                 survey_id: s.survey_id,
                 user_id: s.user_id,
                 title: s.title, 
-                questions: s.questions,
+                questions: JSON.parse(s.questions),
                 answers_number: s.answers_number
             }));
             resolve(survey);
@@ -77,3 +77,36 @@ exports.surveyById = (surveyId) => {
         });
     });
 };
+
+exports.addAnswers = (surveyId, name, answers) => {
+    console.log("adding answers in the answers table");
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO answers(survey_id, name, answers) VALUES(?, ?, ? )';
+        db.all(sql, [surveyId, name, JSON.stringify(answers)], (err, rows) => {
+            if (err) {
+                console.log("failed to insert answers in answers table");
+                reject(err);
+                return;
+            }
+        
+            resolve(surveyId);
+        });
+    });
+
+};
+
+exports.incrementAnswersNum = (surveyId, answerNumber) => {
+    console.log("incrementing the answerNumber in surveys table")
+    return new Promise((resolve, reject) => {
+        const sql = 'UPDATE surveys SET answers_number=? WHERE survey_id=?';
+        db.all(sql, [answerNumber, surveyId], (err, rows) => {
+            if (err) {
+                console.log("failed to update answer_number in surveys table");
+                reject(err);
+                return;
+            }
+        
+            resolve(surveyId);
+        });
+    });
+}
