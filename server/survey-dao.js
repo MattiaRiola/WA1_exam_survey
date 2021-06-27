@@ -68,9 +68,10 @@ exports.surveyById = (surveyId) => {
                     survey_id: row.survey_id,
                     user_id: row.user_id,
                     title: row.title, 
-                    questions: row.questions,
+                    questions: JSON.parse(row.questions),
                     answers_number: row.answers_number
                 };
+
                 resolve(survey);
               }
         });

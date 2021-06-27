@@ -48,7 +48,7 @@ async function getSurveysByAdmin() {
         const response = await fetch('/api/yourSurveys/');
         if (response.ok) {
             const surveys = await response.json();
-            return surveys.map(s => {s.questions = JSON.parse(s.questions); return s;});
+            return surveys;
         }
         else {
             throw new Error(response.statusText);
@@ -64,7 +64,7 @@ async function getAllSurveys() {
         const response = await fetch('/api/allSurveys/');
         if (response.ok) {
             const surveys = await response.json();
-            return surveys.map(s => {s.questions = JSON.parse(s.questions); return s;});
+            return surveys;
         }
         else {
             throw new Error(response.statusText);
@@ -81,7 +81,6 @@ async function getSurveyById(id){
         if (response.ok) {
             const survey = await response.json();
             
-            survey.questions = JSON.parse(survey.questions);
             return survey;
         }
         else {
