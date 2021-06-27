@@ -79,12 +79,12 @@ exports.surveyById = (surveyId) => {
 };
 
 exports.addAnswers = (surveyId, name, answers) => {
-    console.log("adding answers in the answers table");
+    console.log("adding " + name + "'s answers in the answers table");
     return new Promise((resolve, reject) => {
         const sql = 'INSERT INTO answers(survey_id, name, answers) VALUES(?, ?, ? )';
         db.all(sql, [surveyId, name, JSON.stringify(answers)], (err, rows) => {
             if (err) {
-                console.log("failed to insert answers in answers table");
+                console.log("failed to insert answers in answers table\n err:\n " + err);
                 reject(err);
                 return;
             }

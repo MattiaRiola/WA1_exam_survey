@@ -1,35 +1,10 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Col, Button } from 'react-bootstrap';
-import Form from 'react-bootstrap/Form';
+import { Col, Button, Form, Alert, Row, Container, InputGroup } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import API from './API.js';
 
 
-/**
- * 
- * @param {*} props survey = 
-    * {
-    *  survey_id,
-    *  user_id,
-    *  title,
-    *  questions = {
-    *      questionId,
-    *      surveyId
-    *      title,
-    *      mandatory,
-    *      
-    *      (if closedQuestion): 
-    *          min,max, options = {
-    *              optionId,
-    *              questionId,
-    *              surveyId,
-    *              text
-    *              }
-    *      (if openQuestion):
-    *       text 
-    *  }
-    * } 
- */
+
 function AnswerSurvey(props) {
     let voidAnswers = [];
     const [answers, setAnswers] = useState(voidAnswers);
@@ -59,18 +34,14 @@ function AnswerSurvey(props) {
 
     const [questions, setQuestions] = useState([]);
     const [selectedSurvey, setSelectedSurvey] = useState();
-    /**
-     * answers = [
-     *  {
-     *      questionId,
-     *      (if closedQuestion)
-     *          selectedOptions = [array of integer (optionId)]
-     *      (if openQuestion)
-     *          text
-     *  },
-     *  ...
-     * ]
-     */
+    const [validationError, setValidationError] = useState("");
+
+    const [visitorName, setVisitorName] = useState("");
+    const [startAnswer, setStartAnswer] = useState(false);
+    const submitVisitorName = () => {
+        if (visitorName.length > 0)
+            setStartAnswer(true);
+    }
 
     useEffect(() => {
         console.log("Trying to fill the questions of survey_id = " + props.surveyId);
@@ -117,14 +88,15 @@ function AnswerSurvey(props) {
         else {
             return (
 
-                <>
+                <>{startAnswer ?
                     (<Col className="bg-light" >
-                        <h5>TODO: Insert the mandatory name and use it as use state to force it to be not empty before showing the questions</h5>
+                        {validationError.length > 0 ? <Alert variant={"danger"}>{validationError}</Alert> : <></>}
                         <QuestionTable surveys={props.surveys} questions={questions} survey={props.survey} selectOption={selectOption}
-                            answers={answers} setAnswers={setAnswers} />
+                            visitorName={visitorName} answers={answers} setAnswers={setAnswers} setValidationError={setValidationError} />
                         <AnswersTable answers={answers} />
                     </Col>)
-
+                    : (<NameForm submitVisitorName={submitVisitorName} visitorName={visitorName} setVisitorName={setVisitorName} />)
+                }
                 </>
 
             );
@@ -141,22 +113,21 @@ function QuestionTable(props) {
         for (let q of props.questions) {
             if (q.options !== undefined) {
                 if (q.min > 0 && props.answers[q.questionId - 1].selectedOptions.length < 1)
-                    validationError+=("question number " + q.questionId + " is required, please give an answer\n");
+                    validationError += ("question number " + q.questionId + " is required, please give an answer\n");
             } else {
                 if (q.mandatory == 1 && props.answers[q.questionId - 1].text.length < 1)
-                    validationError+=("question number " + q.questionId + " is required, the text must not be empty\n");
+                    validationError += ("question number " + q.questionId + " is required, the text must not be empty\n");
             }
         }
-        if(validationError == ""){
+        if (validationError == "") {
             API.sendAnswers(
                 props.answers,
-                 props.survey.survey_id,
-                //TODO: VisitorName
-                // props.visitorName
-                "Bugo" 
-                )
+                props.survey.survey_id,
+                props.visitorName
+                
+            )
         }
-        console.log(validationError);
+        props.setValidationError(validationError);
     }
 
 
@@ -198,9 +169,9 @@ function OpenQuestionRow(props) {
     return (
         <>
 
-            <Form.Label>{props.question.title} {props.question.max} {props.question.options === undefined ? 
-                        props.question.mandatory ? "mandatory" : ""                            
-                         : props.question.min > 0 ? "mandatory" : "" }
+            <Form.Label>{props.question.title} {props.question.max} {props.question.options === undefined ?
+                props.question.mandatory ? "mandatory" : ""
+                : props.question.min > 0 ? "mandatory" : ""}
             </Form.Label>
             <Form.Control as="textarea"
                 rows={3}
@@ -294,6 +265,51 @@ function AnswersTable(props) {
             )}
         </>
     );
+}
+
+function NameForm(props) {
+    const [warning, setWarning] = useState(false);
+    const handleSubmit = (event) => {
+
+        if (props.visitorName.length == 0) {
+            setWarning(true)
+        }
+        else {
+            props.submitVisitorName();
+        }
+
+    };
+
+    return (
+        <>
+            <Container>
+                {warning ?  (<Row className="justify-content-md-center"><Alert variant={"danger"}>Name is mandatory </Alert> </Row>) : <></>}
+                <Row className="justify-content-md-center">
+                    <Form noValidate onSubmit={handleSubmit} >
+
+                        <Form.Group controlId="formBasicDescrption">
+                            <Form.Label>Enter your name</Form.Label>
+                                <Form.Control
+                                    type="user"
+                                    required
+                                    placeholder="Enter your name here"
+                                    value={props.visitorName}
+                                    onChange={
+                                        answerText => {
+                                            props.setVisitorName(answerText.target.value);
+                                        }
+                                    }
+                                />
+                        </Form.Group>
+
+                        <Button type="submit">Start survey</Button>
+                    </Form>
+                </Row>
+            </Container>
+
+        </>
+    );
+
 }
 
 export default AnswerSurvey;
