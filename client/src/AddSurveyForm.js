@@ -22,7 +22,7 @@ function QuestionTable(props) {
     const [questions, setQuestions] = useState([]);
 
     const [surveyTitle, setSurveyTitle] = useState("");
-    const [validationErrMsg,setValidationErrMsg ] = useState("");
+    const [validationErrMsg, setValidationErrMsg] = useState("");
 
 
     //Modal openQuestion
@@ -38,11 +38,11 @@ function QuestionTable(props) {
     const handleSubmitSurvey = (event) => {
         //TODO: add some validation
         event.preventDefault();
-        if(surveyTitle == ""){
+        if (surveyTitle == "") {
             setValidationErrMsg("Title must not be empty");
             return;
         }
-        if(questions.length == 0){
+        if (questions.length == 0) {
             setValidationErrMsg("You must add at least one questoin");
             return;
         }
@@ -53,7 +53,7 @@ function QuestionTable(props) {
     }
 
     return (
-        <>  
+        <>
             <p>{validationErrMsg}</p>
             {showOpenQuestion ? <ModalOpenQuestion show={showOpenQuestion} handleClose={handleCloseOpenQuestion}
                 setQuestions={setQuestions}
@@ -83,10 +83,10 @@ function QuestionTable(props) {
                     questions.map(question =>
                         question.options === undefined ?
                             <OpenQuestionRow key={question.questionId}
-                                question={question}
+                                question={question} setQuestions={setQuestions} questions={questions}
                             />
                             : <ClosedQuestionRow key={question.questionId}
-                                question={question}
+                                question={question} setQuestions={setQuestions} questions={questions}
                             />
 
 
@@ -126,9 +126,20 @@ function OpenQuestionRow(props) {
     else
         questionTitle += "\n (optional)";
     return (
-        <>
+        <>  <Button size="sm" className="mr-2" variant="danger"
+            onClick={() => {
+                props.setQuestions(oldQuestions => oldQuestions.filter(q => q.questionId != props.question.questionId))
+            }}>x</Button>
+            {
+                props.question.questionId == 0 ? <></> : <Button size="sm" variant="outline-primary" className="mr-2"
+                    onClick={() => { }}>↑</Button>
+            }
+            {(props.question.questionId == (props.questions.length - 1)) ? <></> : <Button size="sm" variant="outline-primary" className="mr-2"
+                onClick={() =>{ } }>↓</Button>
+            }
             <Form.Label>{questionTitle}
             </Form.Label>
+            
             <Form.Control as="textarea"
                 rows={3}
                 type="description"
@@ -145,12 +156,24 @@ function ClosedQuestionRow(props) {
     return (
         <>
             <Form.Group>
+                <Form.Row>
 
-                <p key={props.question.questionId}>
-                    {questionTitle}
-                </p>
+                    <Button size="sm" variant="danger" className="mr-2"
+                        onClick={() => {
+                            props.setQuestions(oldQuestions => oldQuestions.filter(q => q.questionId != props.question.questionId))
+                        }}>x</Button>
+                    {props.question.questionId == 0 ? <></> : <Button size="sm" variant="outline-primary" className="mr-2"
+                        onClick={() => { }}>↑</Button>}
+                    {(props.question.questionId == (props.questions.length - 1)) ? <></> : <Button size="sm" variant="outline-primary" className="mr-2"
+                        onClick={() => { }}>↓</Button>}
+                    <text key={props.question.questionId}>
+                        {questionTitle}
+                    </text>
+                    
+                </Form.Row>
+
                 {props.question.options.map(option =>
-                    <Form.Check type="checkbox" id="gridCheck3" disabled
+                    <Form.Check className="ml-5" type="checkbox" id="gridCheck3" disabled
                         label={option.text} />
 
                 )}
