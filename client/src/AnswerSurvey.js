@@ -305,7 +305,7 @@ function NameForm(props) {
                             />
                         </Form.Group>
 
-                        <Button type="submit">Start survey</Button>
+                         {props.visitorName.length > 0 ?  <Button type="submit">Start survey</Button>: ""}
                     </Form>
                 </Row>
             </Container>

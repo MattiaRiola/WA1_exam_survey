@@ -49,6 +49,7 @@ function App() {
   }
 
 
+
   //Rehydrate tasks at mount time and when the variables change
   useEffect(() => {
     API.getUserInfo().then(user => {    /* I'm in the "then", the user is logged in ( the API returned an user info object) */
@@ -60,46 +61,46 @@ function App() {
 
 
     // if (dirty) { //I will load the surveys only if they need to be rehydrate (dirty = true)
-      if (loggedIn) {
-        console.log("rehydrating admin's surveys, length = ", surveys.length)
-        API.getSurveysByAdmin().then(newS => {
-          let result = [];
-          newS.forEach(survey => {
-            result.push(survey);
-          });
+    if (loggedIn) {
+      console.log("rehydrating admin's surveys, length = ", surveys.length)
+      API.getSurveysByAdmin().then(newS => {
+        let result = [];
+        newS.forEach(survey => {
+          result.push(survey);
+        });
+        setDirty(false);
+        setSurveys(result);
+        setLoading(false);
+      })
+        .catch(err => {
+          console.log(err);
+          //this must be the right order in this way I wont send more than 1 request to the server
+          // setting Dirty the if will be false
           setDirty(false);
-          setSurveys(result);
+          setSurveys([]);
           setLoading(false);
-        })
-          .catch(err => {
-            console.log(err);
-            //this must be the right order in this way I wont send more than 1 request to the server
-            // setting Dirty the if will be false
-            setDirty(false);
-            setSurveys([]);
-            setLoading(false);
-          });
-      }
-      else {
-        console.log("rehydrating all the surveys, length = ", surveys.length)
+        });
+    }
+    else {
+      console.log("rehydrating all the surveys, length = ", surveys.length)
 
-        API.getAllSurveys().then(newS => {
-          let result = [];
-          newS.forEach(survey => {
-            result.push(survey);
-          });
+      API.getAllSurveys().then(newS => {
+        let result = [];
+        newS.forEach(survey => {
+          result.push(survey);
+        });
+        setDirty(false);
+        setSurveys(result);
+        setLoading(false);
+      })
+        .catch(err => {
+          console.log(err);
+          //this must be the right order in this way I wont send more than 1 request to the server
+          // setting Dirty the if will be false
           setDirty(false);
-          setSurveys(result);
+          setSurveys([]);
           setLoading(false);
-        })
-          .catch(err => {
-            console.log(err);
-            //this must be the right order in this way I wont send more than 1 request to the server
-            // setting Dirty the if will be false
-            setDirty(false);
-            setSurveys([]);
-            setLoading(false);
-          });
+        });
 
       // }
 
@@ -108,12 +109,13 @@ function App() {
 
   }, [loggedIn, surveys.length, dirty]);
 
-
-  return (
-    <Router>
-      <MyNavbar message={message} logout={doLogOut} loggedIn={loggedIn} />
-      <Container fluid>
-        <Row className="row-height">
+  if (loading)
+    return (<><h1>Loading...</h1></>)
+  else
+    return (
+      <Router>
+        <MyNavbar message={message} logout={doLogOut} loggedIn={loggedIn} />
+        <Container fluid>
           <Switch>
 
             <Route path="/survey/:survey_id" render={({ match }) =>
@@ -136,15 +138,15 @@ function App() {
             </Route>
           </Switch>
 
-        </Row>
-      </Container>
 
-    </Router>
+        </Container>
 
-
+      </Router>
 
 
-  );
+
+
+    );
 }
 
 export default App;

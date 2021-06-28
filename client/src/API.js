@@ -112,7 +112,7 @@ async function sendAnswers(answers, surveyId, visitorName){
 }
 async function getAnswersBySurveyId(surveyId){
     try {
-        const response = await fetch('api/survey/'+surveyId+'/getAnswers');
+        const response = await fetch('/api/survey/'+surveyId+'/getAnswers');
         if (response.ok) {
             const survey = await response.json();
             
