@@ -29,7 +29,6 @@
 | 1       | admin@mail.com         | admin     | password      |
 | 2       | riola.mattia@gmail.com | Mattia    | mattia        |
 | 3       | teacher@polito.com     | Teacher   | teacher30     |
-| --      | ---------------------- | --------- | ------------- |
 
 -----
 

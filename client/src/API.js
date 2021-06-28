@@ -43,9 +43,75 @@ async function getUserInfo() {
     }
 }
 
+async function getSurveysByAdmin() {
+    try {
+        const response = await fetch('/api/yourSurveys/');
+        if (response.ok) {
+            const surveys = await response.json();
+            return surveys;
+        }
+        else {
+            throw new Error(response.statusText);
+        }
+    } catch (err) {
+        console.log(err);
+        throw new Error(err);
+    }
+}
 
+async function getAllSurveys() {
+    try {
+        const response = await fetch('/api/allSurveys/');
+        if (response.ok) {
+            const surveys = await response.json();
+            return surveys;
+        }
+        else {
+            throw new Error(response.statusText);
+        }
+    } catch (err) {
+        console.log(err);
+        throw new Error(err);
+    }
+}
 
-const API = { logIn, logOut, getUserInfo };
+async function getSurveyById(id){
+    try {
+        const response = await fetch('/api/survey/'+id);
+        if (response.ok) {
+            const survey = await response.json();
+            
+            return survey;
+        }
+        else {
+            throw new Error(response.statusText);
+        }
+    } catch (err) {
+        console.log(err);
+        throw new Error(err);
+    }
+}
+
+async function sendAnswers(answers, surveyId, visitorName){
+    return fetch('api/sendAnswers' ,{
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            answers: answers,
+            surveyId: surveyId,
+            visitorName: visitorName})
+    })
+    .then(()=>{
+        console.log(visitorName + "'s answers added");
+    })
+    .catch(function (error){
+            console.log('Failed to store data on server: ', error);
+    });
+}
+
+const API = { logIn, logOut, getUserInfo , getSurveysByAdmin, getAllSurveys, getSurveyById, sendAnswers};
 
 
 export default API;
