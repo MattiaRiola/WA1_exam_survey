@@ -1,5 +1,5 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Col, Button, Form, Alert, Row, Container, InputGroup } from 'react-bootstrap';
+import { Col, Button, Form, Alert, Row, Container } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import API from './API.js';
 
@@ -93,7 +93,7 @@ function AnswerSurvey(props) {
                         {validationError.length > 0 ? <Alert variant={"danger"}>{validationError}</Alert> : <></>}
                         <QuestionTable surveys={props.surveys} questions={questions} survey={props.survey} selectOption={selectOption}
                             visitorName={visitorName} answers={answers} setAnswers={setAnswers} setValidationError={setValidationError} />
-                        <AnswersTable answers={answers} />
+                        {validationError.length > 0 ? <AnswersTable answers={answers} /> : <></>}
                     </Col>)
                     : (<NameForm submitVisitorName={submitVisitorName} visitorName={visitorName} setVisitorName={setVisitorName} />)
                 }
@@ -124,7 +124,7 @@ function QuestionTable(props) {
                 props.answers,
                 props.survey.survey_id,
                 props.visitorName
-                
+
             )
         }
         props.setValidationError(validationError);
@@ -166,12 +166,14 @@ function QuestionTable(props) {
 }
 
 function OpenQuestionRow(props) {
+    let questionTitle = props.question.title;
+    if (props.question.mandatory)
+        questionTitle += "\n (mandatory)";
+    else
+        questionTitle += "\n (optional)";
     return (
         <>
-
-            <Form.Label>{props.question.title} {props.question.max} {props.question.options === undefined ?
-                props.question.mandatory ? "mandatory" : ""
-                : props.question.min > 0 ? "mandatory" : ""}
+            <Form.Label>{questionTitle} {props.question.max}
             </Form.Label>
             <Form.Control as="textarea"
                 rows={3}
@@ -197,18 +199,20 @@ function OpenQuestionRow(props) {
             />
 
 
+
         </>
     );
 }
 
 function ClosedQuestionRow(props) {
+    let questionTitle = props.question.title+"   (maxAnswers: "+props.question.max+" minAnswers: "+props.question.min+")";
 
     return (
         <>
 
-            <h5>
-                {props.question.title}
-            </h5>
+            <p key={props.question.questionId}>
+                {questionTitle}
+            </p>
             {props.question.options.map(option =>
                 <Form.Row key={option.optionId}>
                     <QuestionOption
@@ -256,11 +260,11 @@ function QuestionOption(props) {
 function AnswersTable(props) {
     return (
         <>
-            <h1>Answers: </h1>
+            <h3>given answers: </h3>
             {props.answers.map(a =>
                 <p key={a.questionId} >
                     question n. {a.questionId}:
-                    {a.text === undefined ? ("selected options: [" + a.selectedOptions + "]") : a.text}
+                    {a.text === undefined ? ("selected options: [ " + a.selectedOptions + " ]") : a.text}
                 </p>
             )}
         </>
@@ -283,23 +287,23 @@ function NameForm(props) {
     return (
         <>
             <Container>
-                {warning ?  (<Row className="justify-content-md-center"><Alert variant={"danger"}>Name is mandatory </Alert> </Row>) : <></>}
+                {warning ? (<Row className="justify-content-md-center"><Alert variant={"danger"}>Name is mandatory </Alert> </Row>) : <></>}
                 <Row className="justify-content-md-center">
                     <Form noValidate onSubmit={handleSubmit} >
 
                         <Form.Group controlId="formBasicDescrption">
                             <Form.Label>Enter your name</Form.Label>
-                                <Form.Control
-                                    type="user"
-                                    required
-                                    placeholder="Enter your name here"
-                                    value={props.visitorName}
-                                    onChange={
-                                        answerText => {
-                                            props.setVisitorName(answerText.target.value);
-                                        }
+                            <Form.Control
+                                type="user"
+                                required
+                                placeholder="Enter your name here"
+                                value={props.visitorName}
+                                onChange={
+                                    answerText => {
+                                        props.setVisitorName(answerText.target.value);
                                     }
-                                />
+                                }
+                            />
                         </Form.Group>
 
                         <Button type="submit">Start survey</Button>
