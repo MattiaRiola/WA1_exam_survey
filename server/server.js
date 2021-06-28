@@ -92,7 +92,7 @@ app.get('/api/allSurveys',
     }
 )
 
-app.get('/api/yourSurveys',
+app.get('/api/yourSurveys', isLoggedIn,
     (req, res) => {
         survey_dao.surveysByAdmin(req.user.id)
             .then((surveys) => { res.json(surveys) })
@@ -105,6 +105,15 @@ app.get('/api/survey/:id',
         const id = req.params.id;
         survey_dao.surveyById(id)
             .then((survey) => { res.json(survey) })
+            .catch((error) => { res.status(500).json(error) });
+    }
+)
+
+app.get('/api/survey/:id/getAnswers',
+    (req, res) => {
+        const id = req.params.id;
+        survey_dao.answersBySurveyId(id)
+            .then((answers) => { res.json(answers) })
             .catch((error) => { res.status(500).json(error) });
     }
 )
@@ -148,7 +157,7 @@ app.post('/survey/api/sendAnswers',
                     if (answer[0] === undefined) {
                         ansNum = 0;
                     } else {
-                        console.log("closed answer num options:  " +answer[0].selectedOptions.length);
+                        console.log("closed answer num options:  " + answer[0].selectedOptions.length);
                         ansNum = answer[0].selectedOptions.length;
                     }
 
@@ -187,8 +196,22 @@ app.post('/survey/api/sendAnswers',
             })
             .catch((error) => { res.status(500).json(error); });
     }
+
 );
 
+app.post('/api/sendNewSurvey', isLoggedIn,(req, res) => {
+    const survey = {title: req.body.title, questions: req.body.questions};
+    if (survey == undefined)
+        console.log("cannot add survey because the survey is not found");
+    survey_dao.addSurvey(survey, req.user.id).then(() => {
+        
+        console.log("added survey: " + survey.name);
+        res.end();
+    })
+        .catch((error) => { res.status(500).json(error); });
+}
+
+)
 
 /*****************************************************************************************/
 /**

@@ -110,8 +110,40 @@ async function sendAnswers(answers, surveyId, visitorName){
             console.log('Failed to store data on server: ', error);
     });
 }
+async function getAnswersBySurveyId(surveyId){
+    try {
+        const response = await fetch('/api/survey/'+surveyId+'/getAnswers');
+        if (response.ok) {
+            const survey = await response.json();
+            
+            return survey;
+        }
+        else {
+            throw new Error(response.statusText);
+        }
+    } catch (err) {
+        console.log(err);
+        throw new Error(err);
+    }
+}
 
-const API = { logIn, logOut, getUserInfo , getSurveysByAdmin, getAllSurveys, getSurveyById, sendAnswers};
+async function sendNewSurvey(survey){
+    return fetch('api/sendNewSurvey' ,{
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(survey)
+    })
+    .then(()=>{
+        console.log(survey.title + " added");
+    })
+    .catch(function (error){
+            console.log('Failed to store data on server: ', error);
+    });
+}
+
+const API = { logIn, logOut, getUserInfo , getSurveysByAdmin, getAllSurveys, getSurveyById, sendAnswers, getAnswersBySurveyId, sendNewSurvey};
 
 
 export default API;

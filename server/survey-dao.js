@@ -78,6 +78,30 @@ exports.surveyById = (surveyId) => {
     });
 };
 
+exports.answersBySurveyId = (surveyId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM answers WHERE survey_id = ?';
+        db.all(sql, [surveyId], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+              }
+              if (rows == undefined) {
+                reject({error: 'answers not found.'});
+              } else {
+                const answers =rows.map((a) => ({ 
+                    answer_id: a.answer_id,
+                    survey_id: a.survey_id,
+                    name: a.name, 
+                    answers: JSON.parse(a.answers),
+                    }));
+
+                resolve(answers);
+               }
+        });
+    });
+}
+
 exports.addAnswers = (surveyId, name, answers) => {
     console.log("adding " + name + "'s answers in the answers table");
     return new Promise((resolve, reject) => {
@@ -94,6 +118,22 @@ exports.addAnswers = (surveyId, name, answers) => {
     });
 
 };
+
+exports.addSurvey = (survey, userId) => {
+    console.log("adding survey " + survey.title);
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO surveys(title, questions, user_id, answers_number) VALUES(?, ?, ?, 0 )';
+        db.all(sql, [survey.title, JSON.stringify(survey.questions), userId], (err, rows) => {
+            if (err) {
+                console.log("failed to insert answers in answers table\n err:\n " + err);
+                reject(err);
+                return;
+            }
+        
+            resolve(userId);
+        });
+    });
+}
 
 exports.incrementAnswersNum = (surveyId, answerNumber) => {
     console.log("incrementing the answerNumber in surveys table")
