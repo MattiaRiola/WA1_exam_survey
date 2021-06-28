@@ -45,19 +45,19 @@
   - 'Website satisfaction' `questions` :  
 ```plantuml
 @startjson
-[{"title":"Rate this website","mandatory":1,"questionId":1,"surveyId":1,"max":1,"min":1,"options":[{"optionId":1,"questionId":1,"surveyId":1,"text":"very good"},{"optionId":2,"questionId":1,"surveyId":1,"text":"good"},{"optionId":3,"questionId":1,"surveyId":1,"text":"average"},{"optionId":4,"questionId":1,"surveyId":1,"text":"bad"},{"optionId":5,"questionId":1,"surveyId":1,"text":"very bad"}]},{"title":"tell me what you think about this website:","mandatory":0,"questionId":2,"surveyId":1},{"title":"Where did you find this website?","mandatory":0,"max":3,"min":0,"questionId":3,"surveyId":1,"options":[{"optionId":1,"questionId":3,"surveyId":1,"text":"social"},{"optionId":2,"questionId":3,"surveyId":1,"text":"friends"},{"optionId":3,"questionId":3,"surveyId":1,"text":"others"}]}]
+[{"title":"Rate this website","mandatory":1,"questionId":1,"max":1,"min":1,"options":[{"optionId":1,"questionId":1,"text":"very good"},{"optionId":2,"questionId":1,"text":"good"},{"optionId":3,"questionId":1, "text":"average"},{"optionId":4,"questionId":1, "text":"bad"},{"optionId":5,"questionId":1, "text":"very bad"}]},{"title":"tell me what you think about this website:","mandatory":0,"questionId":2,"surveyId":1},{"title":"Where did you find this website?","mandatory":0,"max":3,"min":0,"questionId":3, "options":[{"optionId":1,"questionId":3, "text":"social"},{"optionId":2,"questionId":3, "text":"friends"},{"optionId":3,"questionId":3, "text":"others"}]}]
 @endjson
 ```
  - 'math quiz' `questions` :
 ```plantuml
 @startjson
-[{"title":"2+2 = ","mandatory":0,"questionId":1,"surveyId":2,"max":1,"min":0,"options":[{"optionId":1,"questionId":1,"surveyId":2,"text":"44"},{"optionId":2,"questionId":1,"surveyId":2,"text":"4"}]},{"title":"is math important?","mandatory":0,"max":1,"min":0,"questionId":2,"surveyId":2,"options":[{"optionId":1,"questionId":2,"surveyId":2,"text":"yes"},{"optionId":2,"questionId":2,"surveyId":2,"text":"no"},{"optionId":3,"questionId":2,"surveyId":2,"text":"maybe"}]}]
+[{"title":"2+2 = ","mandatory":0,"questionId":1, "max":1,"min":0,"options":[{"optionId":1,"questionId":1, "text":"44"},{"optionId":2,"questionId":1, "text":"4"}]},{"title":"is math important?","mandatory":0,"max":1,"min":0,"questionId":2, "options":[{"optionId":1,"questionId":2, "text":"yes"},{"optionId":2,"questionId":2, "text":"no"},{"optionId":3,"questionId":2, "text":"maybe"}]}]
 @endjson
 ```
  - 'physics quiz' `questions` :
 ```plantuml
 @startjson
-[{"title":"F = m * a ","mandatory":0,"questionId":1,"surveyId":3,"max":1,"min":0,"options":[{"optionId":1,"questionId":1,"surveyId":3,"text":"True"},{"optionId":2,"questionId":1,"surveyId":3,"text":"False"}]},{"title":"is physics important?","mandatory":0,"max":1,"min":0,"questionId":2,"surveyId":3,"options":[{"optionId":1,"questionId":2,"surveyId":3,"text":"yes"},{"optionId":2,"questionId":2,"surveyId":3,"text":"no"},{"optionId":3,"questionId":2,"surveyId":3,"text":"maybe"}]}]
+[{"title":"F = m * a ","mandatory":0,"questionId":1, "max":1,"min":0,"options":[{"optionId":1,"questionId":1, "text":"True"},{"optionId":2,"questionId":1, "text":"False"}]},{"title":"is physics important?","mandatory":0,"max":1,"min":0,"questionId":2, "options":[{"optionId":1,"questionId":2, "text":"yes"},{"optionId":2,"questionId":2, "text":"no"},{"optionId":3,"questionId":2, "text":"maybe"}]}]
 @endjson
 ```
 
