@@ -1,16 +1,14 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from "react-bootstrap/Modal";
-import { Col, Button, Form, Alert, Row, Container } from 'react-bootstrap';
-import { useEffect, useState } from 'react';
-import API from './API.js';
-import { Redirect } from 'react-router-dom';
+import {  Button, Form } from 'react-bootstrap';
+import {  useState } from 'react';
 
 
 
 function ModalClosedQuestion(props) {
-
     const [title, setTitle] = useState("");
-    const [options, setOptions] = useState(["", ""]);
+    const [options, setOptions] = useState(["", ""]); 
+    //min 2 options in the question by default
     const [min, setMin] = useState(0);
     const [max, setMax] = useState(1);
     const handleSubmitQuestion = (event) => {
@@ -21,6 +19,7 @@ function ModalClosedQuestion(props) {
             questionId: props.questions.length,
             title: title,
             min: min,
+            mandatory: min,
             max: max,
             options: options.map((o,i) => {return {optionId: i, text: o}})
         }

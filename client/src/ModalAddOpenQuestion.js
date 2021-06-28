@@ -16,7 +16,7 @@ function ModalOpenQuestion(props) {
         let question = {
             questionId: props.questions.length,
             title: title,
-            mandatory: mandatory
+            mandatory: mandatory ? 1 : 0
         }
         props.setQuestions((oldQuestions)=>[...oldQuestions,question]);
     
