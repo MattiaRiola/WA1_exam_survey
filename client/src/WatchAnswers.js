@@ -95,7 +95,7 @@ function OpenQuestionRow(props) {
             rows={3}
             readOnly
             type="description"
-            placeholder="Enter your answer here"
+            placeholder="Void answer"
             value={props.answer === undefined ? "loading... answer" : props.answer.text}
 
         />
