@@ -19,7 +19,9 @@ function AddSurveyForm(props) {
 }
 
 function QuestionTable(props) {
+
     const [questions, setQuestions] = useState([]);
+
 
     const [surveyTitle, setSurveyTitle] = useState("");
     const [validationErrMsg, setValidationErrMsg] = useState("");
@@ -51,6 +53,8 @@ function QuestionTable(props) {
             questions: questions
         });
     }
+    if (questions === undefined)
+        return (<><h1>Loading questions...</h1></>);
 
     return (
         <>
@@ -119,7 +123,50 @@ function QuestionTable(props) {
 }
 
 function OpenQuestionRow(props) {
-
+    const moveQuestionUp = (questionId) => {
+        questionId = questionId;
+        let newIndex = questionId - 1;
+        let oldIndex = questionId;
+        props.setQuestions(oldQuestions => {
+            let tmp = oldQuestions.slice();
+            let element = tmp[oldIndex];
+            tmp[oldIndex] = tmp[newIndex];
+            tmp[newIndex] = element;
+            tmp.map((q, i) => {
+                q.questionId = i
+                return q;
+            })
+            return tmp;
+        })
+    }
+    const moveQuestionDown = (questionId) => {
+        questionId = questionId;
+        let newIndex = questionId + 1;
+        let oldIndex = questionId;
+        props.setQuestions(oldQuestions => {
+            let tmp = oldQuestions.slice();
+            let element = tmp[oldIndex];
+            tmp[oldIndex] = tmp[newIndex];
+            tmp[newIndex] = element;
+            tmp.map((q, i) => {
+                q.questionId = i
+                return q;
+            })
+            return tmp;
+        })
+    }
+    const deleteQuestion = (questionId) => {
+        props.setQuestions(oldQuestions => {
+            let tmp = oldQuestions.slice();
+            let tmpFiltered = tmp.filter(o => o.questionId != questionId);
+            let tmpOrdered = tmpFiltered.map((q,i)=>{
+                q.questionId = i;
+                return q;
+            })
+            
+            return tmpOrdered;
+        })
+    }
     let questionTitle = props.question.title;
     if (props.question.mandatory)
         questionTitle += "\n (mandatory)";
@@ -128,18 +175,19 @@ function OpenQuestionRow(props) {
     return (
         <>  <Button size="sm" className="mr-2" variant="danger"
             onClick={() => {
-                props.setQuestions(oldQuestions => oldQuestions.filter(q => q.questionId != props.question.questionId))
+                deleteQuestion(props.question.questionId);
+
             }}>x</Button>
             {
                 props.question.questionId == 0 ? <></> : <Button size="sm" variant="outline-primary" className="mr-2"
-                    onClick={() => { }}>↑</Button>
+                    onClick={() => { moveQuestionUp(props.question.questionId) }}>↑</Button>
             }
             {(props.question.questionId == (props.questions.length - 1)) ? <></> : <Button size="sm" variant="outline-primary" className="mr-2"
-                onClick={() =>{ } }>↓</Button>
+                onClick={() => { moveQuestionDown(props.question.questionId) }}>↓</Button>
             }
             <Form.Label>{questionTitle}
             </Form.Label>
-            
+
             <Form.Control as="textarea"
                 rows={3}
                 type="description"
@@ -160,7 +208,8 @@ function ClosedQuestionRow(props) {
 
                     <Button size="sm" variant="danger" className="mr-2"
                         onClick={() => {
-                            props.setQuestions(oldQuestions => oldQuestions.filter(q => q.questionId != props.question.questionId))
+                            props.setQuestions(oldQuestions => oldQuestions.filter(q => q.questionId != props.question.questionId));
+
                         }}>x</Button>
                     {props.question.questionId == 0 ? <></> : <Button size="sm" variant="outline-primary" className="mr-2"
                         onClick={() => { }}>↑</Button>}
@@ -169,7 +218,7 @@ function ClosedQuestionRow(props) {
                     <text key={props.question.questionId}>
                         {questionTitle}
                     </text>
-                    
+
                 </Form.Row>
 
                 {props.question.options.map(option =>
