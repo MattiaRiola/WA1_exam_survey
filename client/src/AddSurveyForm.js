@@ -5,6 +5,8 @@ import API from './API.js';
 import { Redirect } from 'react-router-dom';
 import ModalOpenQuestion from './ModalAddOpenQuestion.js';
 import ModalClosedQuestion from './ModalAddClosedQuestion.js';
+
+
 function AddSurveyForm(props) {
 
     return (
@@ -17,17 +19,11 @@ function AddSurveyForm(props) {
 }
 
 function QuestionTable(props) {
-    const [questions, setQuestions] = useState(
-        [{ questionId: 0, title: "question1", mandatory: 0 },
-        { questionId: 1, title: "question2", mandatory: 0 },
-        {
-            questionId: 3, title: "closedQuestion3", min: 0, max: 1,
-            options: [
-                { optionId: 0, questionId: 3, text: "option1" },
-                { optionId: 1, questionId: 3, text: "option2" }]
-        }]);
+    const [questions, setQuestions] = useState([]);
 
     const [surveyTitle, setSurveyTitle] = useState("");
+    const [validationErrMsg,setValidationErrMsg ] = useState("");
+
 
     //Modal openQuestion
     const [showOpenQuestion, setShowOpenQuestion] = useState(false);
@@ -39,14 +35,26 @@ function QuestionTable(props) {
     const handleCloseClosedQuestion = () => setShowClosedQuestion(false);
     const handleShowClosedQuestion = () => setShowClosedQuestion(true);
 
-
-    const handleSubmitSurvey = () => {
-        //TODO: send the survey to the server
-        console.log("TODO: do the submit of the survey");
+    const handleSubmitSurvey = (event) => {
+        //TODO: add some validation
+        event.preventDefault();
+        if(surveyTitle == ""){
+            setValidationErrMsg("Title must not be empty");
+            return;
+        }
+        if(questions.length == 0){
+            setValidationErrMsg("You must add at least one questoin");
+            return;
+        }
+        API.sendNewSurvey({
+            title: surveyTitle,
+            questions: questions
+        });
     }
 
     return (
-        <>
+        <>  
+            <p>{validationErrMsg}</p>
             {showOpenQuestion ? <ModalOpenQuestion show={showOpenQuestion} handleClose={handleCloseOpenQuestion}
                 setQuestions={setQuestions}
                 questions={questions}

@@ -127,7 +127,23 @@ async function getAnswersBySurveyId(surveyId){
     }
 }
 
-const API = { logIn, logOut, getUserInfo , getSurveysByAdmin, getAllSurveys, getSurveyById, sendAnswers, getAnswersBySurveyId};
+async function sendNewSurvey(survey){
+    return fetch('api/sendNewSurvey' ,{
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(survey)
+    })
+    .then(()=>{
+        console.log(survey.title + " added");
+    })
+    .catch(function (error){
+            console.log('Failed to store data on server: ', error);
+    });
+}
+
+const API = { logIn, logOut, getUserInfo , getSurveysByAdmin, getAllSurveys, getSurveyById, sendAnswers, getAnswersBySurveyId, sendNewSurvey};
 
 
 export default API;

@@ -119,6 +119,22 @@ exports.addAnswers = (surveyId, name, answers) => {
 
 };
 
+exports.addSurvey = (survey, userId) => {
+    console.log("adding survey " + survey.title);
+    return new Promise((resolve, reject) => {
+        const sql = 'INSERT INTO surveys(title, questions, user_id, answers_number) VALUES(?, ?, ?, 0 )';
+        db.all(sql, [survey.title, JSON.stringify(survey.questions), userId], (err, rows) => {
+            if (err) {
+                console.log("failed to insert answers in answers table\n err:\n " + err);
+                reject(err);
+                return;
+            }
+        
+            resolve(userId);
+        });
+    });
+}
+
 exports.incrementAnswersNum = (surveyId, answerNumber) => {
     console.log("incrementing the answerNumber in surveys table")
     return new Promise((resolve, reject) => {
