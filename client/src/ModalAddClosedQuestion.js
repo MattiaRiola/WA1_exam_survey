@@ -13,17 +13,27 @@ function ModalClosedQuestion(props) {
     const [options, setOptions] = useState(["", ""]);
     const [min, setMin] = useState(0);
     const [max, setMax] = useState(1);
-    const handleSubmit = () => {
-        console.log("TODO: Handle submit question");
+    const handleSubmitQuestion = (event) => {
+        event.preventDefault();
+
+        //TODO: some validation like in the handle submit in the questionTable in AnswerSurvey component
+        let question = {
+            questionId: props.questions.length,
+            title: title,
+            min: min,
+            max: max,
+            options: options.map((o,i) => {return {optionId: i, text: o}})
+        }
+        props.setQuestions((oldQuestions)=>[...oldQuestions,question]);
     }
     return (
         <>
             <Modal show={props.show} onHide={props.handleClose}>
                 <Modal.Header closeButton>
-                    <Modal.Title>TODO: Closed question</Modal.Title>
+                    <Modal.Title>Insert your closed question</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <Form noValidate onSubmit={handleSubmit}>
+                    <Form noValidate onSubmit={handleSubmitQuestion}>
                         <Form.Label> Question title </Form.Label>
                         <Form.Control
                             required
@@ -46,10 +56,7 @@ function ModalClosedQuestion(props) {
                         >
                             {options.map(
                                 (o, i) => {
-                                    if (i == 0) {
-                                        return "";
-                                    }
-                                    return (<><option>{i}</option>        </>)
+                                    return (<><option>{i+1}</option>        </>)
                                 }
 
                             )}
@@ -73,7 +80,8 @@ function ModalClosedQuestion(props) {
                                     <>
                                         <Form.Label> {i} </Form.Label>
                                         <Form.Control
-                                            equired
+                                            key={i}
+                                            required
                                             rows={2}
                                             type="description"
                                             placeholder="Enter the text of your option"

@@ -10,18 +10,27 @@ function ModalOpenQuestion(props) {
     const [question, setQuestion] = useState();
     const [title, setTitle] = useState("");
     const [mandatory, setMandatory] = useState(0);
-    const handleSubmit = () => {
-        console.log("TODO: Handle submit question");
+    const handleSubmitQuestion = (event) => {
+        event.preventDefault();
+
+        //TODO: some validation like in the handle submit in the questionTable in AnswerSurvey component
+        let question = {
+            questionId: props.questions.length,
+            title: title,
+            mandatory: mandatory
+        }
+        props.setQuestions((oldQuestions)=>[...oldQuestions,question]);
+    
     }
 
     return (<>
 
         <Modal show={props.show} onHide={props.handleClose}>
             <Modal.Header closeButton>
-                <Modal.Title>TODO: Closed question</Modal.Title>
+                <Modal.Title>Insert your open question</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form noValidate onSubmit={handleSubmit}>
+                <Form noValidate onSubmit={handleSubmitQuestion}>
                     <Form.Group>
                         <Form.Label> Question title </Form.Label>
                         <Form.Control

@@ -17,8 +17,15 @@ function AddSurveyForm(props) {
 }
 
 function QuestionTable(props) {
-    const [questions, setQuestions] = useState([{ questionId: 0, title: "question1", mandatory: 0 }, { questionId: 1, title: "question2", mandatory: 0 },
-    { questionId: 3, title: "closedQuestion3", min: 0, max: 1, options: [{ optionId: 0, questionId: 3, text: "option1" }, { optionId: 1, questionId: 3, text: "option2" }] }]);
+    const [questions, setQuestions] = useState(
+        [{ questionId: 0, title: "question1", mandatory: 0 },
+        { questionId: 1, title: "question2", mandatory: 0 },
+        {
+            questionId: 3, title: "closedQuestion3", min: 0, max: 1,
+            options: [
+                { optionId: 0, questionId: 3, text: "option1" },
+                { optionId: 1, questionId: 3, text: "option2" }]
+        }]);
 
     const [surveyTitle, setSurveyTitle] = useState("");
 
@@ -33,19 +40,24 @@ function QuestionTable(props) {
     const handleShowClosedQuestion = () => setShowClosedQuestion(true);
 
 
-    const handleSubmit = () => {
+    const handleSubmitSurvey = () => {
+        //TODO: send the survey to the server
         console.log("TODO: do the submit of the survey");
     }
 
     return (
         <>
             {showOpenQuestion ? <ModalOpenQuestion show={showOpenQuestion} handleClose={handleCloseOpenQuestion}
+                setQuestions={setQuestions}
+                questions={questions}
             /> :
                 ""}
             {showClosedQuestion ? <ModalClosedQuestion show={showClosedQuestion} handleClose={handleCloseClosedQuestion}
+                setQuestions={setQuestions}
+                questions={questions}
             /> :
                 ""}
-            <Form noValidate>
+            <Form noValidate onSubmit={handleSubmitSurvey}>
                 <Form.Group controlId="exampleForm.ControlTextarea1">
                     <Form.Label> Title </Form.Label>
                     <Form.Control as="textarea"
@@ -84,6 +96,11 @@ function QuestionTable(props) {
                             handleShowClosedQuestion();
                         }
                     }> Add new closed question</Button>
+                </Form.Group>
+                <Form.Group>
+                    <Button type="submit">
+                        Send Survey
+                    </Button>
                 </Form.Group>
 
             </Form>
@@ -136,28 +153,5 @@ function ClosedQuestionRow(props) {
 
 }
 
-
-
-
-function OLD_IN_MAIN_OpenQuestionO(props) {
-    //     return(<Form.Group controlId="exampleForm.ControlTextarea1" key={question.questionId}>
-    //     <Form.Label> {question.title} </Form.Label>
-    //     <Form.Control as="textarea"
-    //         type="title"
-    //         placeholder="Enter the title of the survey"
-    //         value={question.title}
-    //         onChange={
-    //             (questionTitleText) => {
-    //                 setSurveyTitle((oldQuestions => {
-    //                     return oldQuestions.map(q => {
-    //                         if (q.questionId == question.questionId)
-    //                             return { title: questionTitleText, questionId: question.questionId, }
-    //                     })
-    //                 }));
-    //             }
-    //         }
-    //     />
-    // </Form.Group>)
-}
 
 export default AddSurveyForm;
