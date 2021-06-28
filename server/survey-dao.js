@@ -78,6 +78,30 @@ exports.surveyById = (surveyId) => {
     });
 };
 
+exports.answersBySurveyId = (surveyId) => {
+    return new Promise((resolve, reject) => {
+        const sql = 'SELECT * FROM answers WHERE survey_id = ?';
+        db.all(sql, [surveyId], (err, rows) => {
+            if (err) {
+                reject(err);
+                return;
+              }
+              if (rows == undefined) {
+                reject({error: 'answers not found.'});
+              } else {
+                const answers =rows.map((a) => ({ 
+                    answer_id: a.answer_id,
+                    survey_id: a.survey_id,
+                    name: a.name, 
+                    answers: JSON.parse(a.answers),
+                    }));
+
+                resolve(answers);
+               }
+        });
+    });
+}
+
 exports.addAnswers = (surveyId, name, answers) => {
     console.log("adding " + name + "'s answers in the answers table");
     return new Promise((resolve, reject) => {

@@ -109,6 +109,15 @@ app.get('/api/survey/:id',
     }
 )
 
+app.get('/api/survey/:id/getAnswers',
+    (req, res) => {
+        const id = req.params.id;
+        survey_dao.answersBySurveyId(id)
+            .then((answers) => { res.json(answers) })
+            .catch((error) => { res.status(500).json(error) });
+    }
+)
+
 app.post('/survey/api/sendAnswers',
     //TODO: Other validations on the other parts of the body
     (req, res) => {
@@ -187,6 +196,7 @@ app.post('/survey/api/sendAnswers',
             })
             .catch((error) => { res.status(500).json(error); });
     }
+    
 );
 
 
