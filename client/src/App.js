@@ -15,6 +15,7 @@ import AdminMainContent from './AdminMainContent';
 import VisitorMainContent from './VisitorMainContent';
 import AnswerSurvey from './AnswerSurvey';
 import WatchAnswers from './WatchAnswers';
+import AddSurveyForm from './AddSurveyForm';
 
 
 function App() {
@@ -127,7 +128,9 @@ function App() {
             <Route path="/login">
               <>{loggedIn ? <Redirect to="/" /> : <LoginForm login={doLogIn} />}</>
             </Route>
-
+            <Route path="/newSurvey">
+              <>{loggedIn ?  <AddSurveyForm/> : <Redirect to="/login" /> }</>
+            </Route>
             <Route exact path="/">
               <>
                 {loggedIn ?

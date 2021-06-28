@@ -1,6 +1,7 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Col, ListGroup } from 'react-bootstrap';
+import { Col, ListGroup, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+
 
 
 function AdminMainContent(props) {
@@ -31,7 +32,8 @@ function ActiveSurveyTable(props) {
 
         }
       </ListGroup>
-    </>
+      <Link to="/newSurvey"> <Button>New survey</Button></Link>
+      </>
   );
 }
 

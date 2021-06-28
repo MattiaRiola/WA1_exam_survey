@@ -178,7 +178,7 @@ function OpenQuestionRow(props) {
         questionTitle += "\n (optional)";
     return (
         <>
-            <Form.Label>{questionTitle} {props.question.max}
+            <Form.Label>{questionTitle} 
             </Form.Label>
             <Form.Control as="textarea"
                 rows={3}
