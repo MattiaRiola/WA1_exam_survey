@@ -44,7 +44,6 @@ function AnswerSurvey(props) {
     }
 
     useEffect(() => {
-        console.log("Trying to fill the questions of survey_id = " + props.surveyId);
         if (props.surveys === undefined) {
             console.log("surveys is undefined so I can't fill the questions");
             return;
