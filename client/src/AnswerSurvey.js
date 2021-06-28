@@ -2,6 +2,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { Col, Button, Form, Alert, Row, Container } from 'react-bootstrap';
 import { useEffect, useState } from 'react';
 import API from './API.js';
+import { Redirect } from 'react-router-dom';
+
 
 
 
@@ -36,6 +38,7 @@ function AnswerSurvey(props) {
     const [selectedSurvey, setSelectedSurvey] = useState();
     const [validationError, setValidationError] = useState("");
 
+    const [submitted, setSubmitted] = useState(false);
     const [visitorName, setVisitorName] = useState("");
     const [startAnswer, setStartAnswer] = useState(false);
     const submitVisitorName = () => {
@@ -91,11 +94,13 @@ function AnswerSurvey(props) {
                     (<Col className="bg-light" >
                         {validationError.length > 0 ? <Alert variant={"danger"}>{validationError}</Alert> : <></>}
                         <QuestionTable surveys={props.surveys} questions={questions} survey={props.survey} selectOption={selectOption}
-                            visitorName={visitorName} answers={answers} setAnswers={setAnswers} setValidationError={setValidationError} />
+                            visitorName={visitorName} answers={answers} setAnswers={setAnswers} setValidationError={setValidationError}
+                            setSubmitted={setSubmitted} />
                         {validationError.length > 0 ? <AnswersTable answers={answers} /> : <></>}
                     </Col>)
                     : (<NameForm submitVisitorName={submitVisitorName} visitorName={visitorName} setVisitorName={setVisitorName} />)
                 }
+                    {submitted ? <Redirect to="/" /> : <></>}
                 </>
 
             );
@@ -124,7 +129,8 @@ function QuestionTable(props) {
                 props.survey.survey_id,
                 props.visitorName
 
-            )
+            ).then(() => props.setSubmitted(true));
+
         }
         props.setValidationError(validationError);
     }
@@ -204,7 +210,7 @@ function OpenQuestionRow(props) {
 }
 
 function ClosedQuestionRow(props) {
-    let questionTitle = props.question.title+"   (maxAnswers: "+props.question.max+" minAnswers: "+props.question.min+")";
+    let questionTitle = props.question.title + "   (maxAnswers: " + props.question.max + " minAnswers: " + props.question.min + ")";
 
     return (
         <>
@@ -305,7 +311,7 @@ function NameForm(props) {
                             />
                         </Form.Group>
 
-                         {props.visitorName.length > 0 ?  <Button type="submit">Start survey</Button>: ""}
+                        {props.visitorName.length > 0 ? <Button type="submit">Start survey</Button> : ""}
                     </Form>
                 </Row>
             </Container>
