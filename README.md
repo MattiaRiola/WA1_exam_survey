@@ -80,7 +80,7 @@
  - 'Luigi' `answers` :
 ```plantuml
 @startjson
-[{"questionId":1,"selectedOptions":[4]},{"questionId":3,"selectedOptions":[3]}]
+[{"questionId":1,"selectedOptions":[4]},{"questionId":2,"text":""},{"questionId":3,"selectedOptions":[3]}]
 @endjson
 ```
  - 'Mattia Riola (s280169) `answers` :
