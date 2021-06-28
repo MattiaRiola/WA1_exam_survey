@@ -21,13 +21,13 @@ function AnswerSurvey(props) {
         setAnswers((oldAnswers) => {
             let newAnswers = oldAnswers.slice();
             if (toCheck) {
-                if (newAnswers[questionId].selectedOptions.length < max)
-                    if (!newAnswers[questionId].selectedOptions.includes(optionId))
-                        newAnswers[questionId].selectedOptions = [...oldAnswers[questionId].selectedOptions, optionId];
+                if (newAnswers.find(a => a.questionId == questionId).selectedOptions.length < max)
+                    if (!newAnswers.find(a => a.questionId == questionId).selectedOptions.includes(optionId))
+                        newAnswers.find(a => a.questionId == questionId).selectedOptions = [...oldAnswers.find(a => a.questionId == questionId).selectedOptions, optionId];
 
             }
             else
-                newAnswers[questionId].selectedOptions = oldAnswers[questionId].selectedOptions.filter(o => o != optionId);
+                newAnswers.find(a => a.questionId == questionId).selectedOptions = oldAnswers.find(a => a.questionId == questionId).selectedOptions.filter(o => o != optionId);
             return newAnswers;
         }
 
@@ -66,17 +66,17 @@ function AnswerSurvey(props) {
         for (let q of selectedSurvey.questions) {
             tmpQuestions.push(q);
             if (q.options === undefined)
-                voidAnswers[q.questionId] = {
+                voidAnswers.push({
                     questionId: q.questionId,
                     text: ""
-                };
+                });
             else
-                voidAnswers[q.questionId] = {
+                voidAnswers.push({
                     questionId: q.questionId,
                     selectedOptions: []
-                };
+                });
         }
-        voidAnswers = voidAnswers.slice(1, voidAnswers.length);
+        voidAnswers = voidAnswers.slice();
         setQuestions(tmpQuestions);
         setAnswers(voidAnswers);
     }, [props.surveys.length, props.surveyId, questions.length, answers.length, selectedSurvey]);
@@ -116,10 +116,10 @@ function QuestionTable(props) {
         let validationError = "";
         for (let q of props.questions) {
             if (q.options !== undefined) {
-                if (q.min > 0 && props.answers[q.questionId - 1].selectedOptions.length < 1)
+                if (q.min > 0 && props.answers.find(a => a.questionId == q.questionId).selectedOptions.length < 1)
                     validationError += ("question number " + q.questionId + " is required, please give an answer\n");
             } else {
-                if (q.mandatory == 1 && props.answers[q.questionId - 1].text.length < 1)
+                if (q.mandatory == 1 && props.answers.find(a => a.questionId == q.questionId).text.length < 1)
                     validationError += ("question number " + q.questionId + " is required, the text must not be empty\n");
             }
         }
@@ -138,6 +138,8 @@ function QuestionTable(props) {
 
     if (props.questions === undefined)
         return (<><h1>Loading questions...</h1></>);
+    if(props.answers === undefined)
+        return(<><h1>Loading... answers</h1></>);
     else
         return (
             <>
@@ -151,7 +153,7 @@ function QuestionTable(props) {
 
                             {
                                 (question.options === undefined) ?
-                                    <OpenQuestionRow key={question.questionId} question={question} questionId={question.questionId - 1} answers={props.answers} setAnswers={props.setAnswers} />
+                                    <OpenQuestionRow key={question.questionId} question={question} questionId={question.questionId} answers={props.answers} setAnswers={props.setAnswers} />
                                     : <ClosedQuestionRow key={question.questionId} questionId={question.questionId}
                                         question={question} answers={props.answers}
                                         setAnswers={props.setAnswers} selectOption={props.selectOption} />
@@ -171,6 +173,10 @@ function QuestionTable(props) {
 }
 
 function OpenQuestionRow(props) {
+    if (props.answers === undefined)
+        return (<><h1>Loading...</h1></>);
+    if (props.answers.find(a => a.questionId == props.question.questionId) === undefined)
+        return (<><h1>Loading...</h1></>);
     let questionTitle = props.question.title;
     if (props.question.mandatory)
         questionTitle += "\n (mandatory)";
@@ -178,13 +184,13 @@ function OpenQuestionRow(props) {
         questionTitle += "\n (optional)";
     return (
         <>
-            <Form.Label>{questionTitle} 
+            <Form.Label>{questionTitle}
             </Form.Label>
             <Form.Control as="textarea"
                 rows={3}
                 type="description"
                 placeholder="Enter your answer here"
-                value={props.answers[props.question.questionId] === undefined ? "" : props.answers[props.questionId].text}
+                value={props.answers.find(a => a.questionId == props.question.questionId) === undefined ? "" : props.answers.find(a=>a.questionId == props.questionId).text}
                 onChange={
                     answerText => {
                         if (answerText.target.value.length > 200) {
@@ -222,7 +228,7 @@ function ClosedQuestionRow(props) {
                 <Form.Row key={option.optionId}>
                     <QuestionOption
                         question={props.question}
-                        questionId={props.questionId - 1}
+                        questionId={props.questionId}
                         option={option}
                         answers={props.answers}
                         setAnswers={props.setAnswers}
@@ -240,18 +246,17 @@ function ClosedQuestionRow(props) {
 }
 
 function QuestionOption(props) {
+    if (props.answers === undefined)
+        return (<><h1>Loading answers</h1></>);
     if (props.questionId === undefined)
         return (<> <h1>Loading questionId</h1></>);
-    else
-        if (props.answers[props.questionId] === undefined)
-            return (<> <h1>Loading answers[props.questionId]</h1></>);
-    if (props.answers[props.questionId].selectedOptions === undefined)
+    if (props.answers.find(a => a.questionId === props.questionId).selectedOptions === undefined)
         return (<><h1> Loading selected options length</h1></>);
     else
         return (
             <>
                 <Form.Check inline type="checkbox" id="gridCheck3"
-                    checked={props.answers[props.questionId].selectedOptions.includes(props.optionId) ? true : false
+                    checked={props.answers.find(a => a.questionId === props.questionId).selectedOptions.includes(props.optionId) ? true : false
 
                     }
                     onChange={(td) => {
