@@ -7,7 +7,6 @@ import API from './API.js';
 import { Redirect } from 'react-router-dom';
 
 function ModalOpenQuestion(props) {
-    const [question, setQuestion] = useState();
     const [title, setTitle] = useState("");
     const [mandatory, setMandatory] = useState(0);
     const handleSubmitQuestion = (event) => {

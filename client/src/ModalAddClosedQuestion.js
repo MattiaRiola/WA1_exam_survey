@@ -8,7 +8,7 @@ import { Redirect } from 'react-router-dom';
 
 
 function ModalClosedQuestion(props) {
-    const [question, setQuestion] = useState();
+
     const [title, setTitle] = useState("");
     const [options, setOptions] = useState(["", ""]);
     const [min, setMin] = useState(0);
