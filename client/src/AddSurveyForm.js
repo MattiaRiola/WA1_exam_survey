@@ -199,6 +199,50 @@ function OpenQuestionRow(props) {
 }
 
 function ClosedQuestionRow(props) {
+    const moveQuestionUp = (questionId) => {
+        questionId = questionId;
+        let newIndex = questionId - 1;
+        let oldIndex = questionId;
+        props.setQuestions(oldQuestions => {
+            let tmp = oldQuestions.slice();
+            let element = tmp[oldIndex];
+            tmp[oldIndex] = tmp[newIndex];
+            tmp[newIndex] = element;
+            tmp.map((q, i) => {
+                q.questionId = i
+                return q;
+            })
+            return tmp;
+        })
+    }
+    const moveQuestionDown = (questionId) => {
+        questionId = questionId;
+        let newIndex = questionId + 1;
+        let oldIndex = questionId;
+        props.setQuestions(oldQuestions => {
+            let tmp = oldQuestions.slice();
+            let element = tmp[oldIndex];
+            tmp[oldIndex] = tmp[newIndex];
+            tmp[newIndex] = element;
+            tmp.map((q, i) => {
+                q.questionId = i
+                return q;
+            })
+            return tmp;
+        })
+    }
+    const deleteQuestion = (questionId) => {
+        props.setQuestions(oldQuestions => {
+            let tmp = oldQuestions.slice();
+            let tmpFiltered = tmp.filter(o => o.questionId != questionId);
+            let tmpOrdered = tmpFiltered.map((q,i)=>{
+                q.questionId = i;
+                return q;
+            })
+            
+            return tmpOrdered;
+        })
+    }
     let questionTitle = props.question.title + "   (maxAnswers: " + props.question.max + " minAnswers: " + props.question.min + ")";
 
     return (
@@ -208,13 +252,12 @@ function ClosedQuestionRow(props) {
 
                     <Button size="sm" variant="danger" className="mr-2"
                         onClick={() => {
-                            props.setQuestions(oldQuestions => oldQuestions.filter(q => q.questionId != props.question.questionId));
-
+                            deleteQuestion(props.question.questionId);
                         }}>x</Button>
                     {props.question.questionId == 0 ? <></> : <Button size="sm" variant="outline-primary" className="mr-2"
-                        onClick={() => { }}>↑</Button>}
+                        onClick={() => { moveQuestionUp(props.question.questionId) }}>↑</Button>}
                     {(props.question.questionId == (props.questions.length - 1)) ? <></> : <Button size="sm" variant="outline-primary" className="mr-2"
-                        onClick={() => { }}>↓</Button>}
+                        onClick={() => { moveQuestionDown(props.question.questionId) }}>↓</Button>}
                     <text key={props.question.questionId}>
                         {questionTitle}
                     </text>
