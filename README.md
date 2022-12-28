@@ -1,6 +1,8 @@
 # Exam #1: "Survey"
 ## Student: s280169 RIOLA MATTIA 
 
+Notes: use nodejs version 14 (for more info on how to setup the dev environment see the wiki)
+
 ## React Client Application Routes
 
 - Route `/`: 
